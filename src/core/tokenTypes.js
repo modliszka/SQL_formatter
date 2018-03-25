@@ -7,6 +7,7 @@ export default {
     STRING: "string",
     RESERVED: "reserved",
     RESERVED_TOPLEVEL: "reserved-toplevel",
+    RESERVED_TABLELEVEL: "reserved-tablelevel",
     RESERVED_NEWLINE: "reserved-newline",
     OPERATOR: "operator",
     OPEN_PAREN: "open-paren",

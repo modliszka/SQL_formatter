@@ -1,7 +1,7 @@
-import Db2Formatter from "./languages/Db2Formatter";
-import N1qlFormatter from "./languages/N1qlFormatter";
+// import Db2Formatter from "./languages/Db2Formatter";
+// import N1qlFormatter from "./languages/N1qlFormatter";
 import StandardSqlFormatter from "./languages/StandardSqlFormatter";
-import MySQLSqlFormatter from "./languages/MySQLFormatter";
+// import MySQLSqlFormatter from "./languages/MySQLFormatter";
 
 export default {
     /**
@@ -17,15 +17,17 @@ export default {
     format: (query, cfg) => {
         cfg = cfg || {};
 
-        switch (cfg.language) {
-            case "db2":
-                return new Db2Formatter(cfg).format(query);
-            case "n1ql":
-                return new N1qlFormatter(cfg).format(query);
-            case "mysql":
-                return new MySQLSqlFormatter(cfg).format(query);
-            default:
-                return new StandardSqlFormatter(cfg).format(query);
-        }
+        return new StandardSqlFormatter(cfg).format(query);
+
+        // switch (cfg.language) {
+        //     case "db2":
+        //         return new Db2Formatter(cfg).format(query);
+        //     case "n1ql":
+        //         return new N1qlFormatter(cfg).format(query);
+        //     case "mysql":
+        //         return new MySQLSqlFormatter(cfg).format(query);
+        //     default:
+        //         return new StandardSqlFormatter(cfg).format(query);
+        // }
     }
 };

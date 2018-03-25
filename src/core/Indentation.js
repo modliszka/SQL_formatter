@@ -3,6 +3,7 @@ import last from "lodash/last";
 
 const INDENT_TYPE_TOP_LEVEL = "top-level";
 const INDENT_TYPE_BLOCK_LEVEL = "block-level";
+const INDENT_TYPE_TABLE_LEVEL = "table-level";
 
 /**
  * Manages indentation levels.
@@ -35,6 +36,13 @@ export default class Indentation {
     increaseToplevel() {
         this.indentTypes.push(INDENT_TYPE_TOP_LEVEL);
     }
+    
+    /**
+     * Increases indentation by one table-level indent.
+     */
+    increaseTableLevel() {
+        this.indentTypes.push(INDENT_TYPE_TABLE_LEVEL);
+    }
 
     /**
      * Increases indentation by one block-level indent.
@@ -45,10 +53,24 @@ export default class Indentation {
 
     /**
      * Decreases indentation by one top-level indent.
+     * 
      * Does nothing when the previous indent is not top-level.
      */
-    decreaseTopLevel() {
+    decreaseTopLevel() {        
+        if (last(this.indentTypes) === INDENT_TYPE_TABLE_LEVEL) {
+            this.indentTypes.pop();
+        }
         if (last(this.indentTypes) === INDENT_TYPE_TOP_LEVEL) {
+            this.indentTypes.pop();
+        }
+    }
+
+    /**
+     * Decreases indentation by one table-level indent.
+     * Does nothing when the previous indent is not top-level.
+     */
+    decreaseTableLevel() {
+        if (last(this.indentTypes) === INDENT_TYPE_TABLE_LEVEL) {
             this.indentTypes.pop();
         }
     }

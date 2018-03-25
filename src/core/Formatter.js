@@ -50,6 +50,10 @@ export default class Formatter {
                 formattedQuery = this.formatToplevelReservedWord(token, formattedQuery);
                 this.previousReservedWord = token;
             }
+            else if (token.type === tokenTypes.RESERVED_TABLELEVEL) {
+                formattedQuery = this.formatTablelevelReservedWord(token, formattedQuery);
+                this.previousReservedWord = token;
+            }
             else if (token.type === tokenTypes.RESERVED_NEWLINE) {
                 formattedQuery = this.formatNewlineReservedWord(token, formattedQuery);
                 this.previousReservedWord = token;
@@ -101,6 +105,17 @@ export default class Formatter {
         query = this.addNewline(query);
 
         this.indentation.increaseToplevel();
+
+        query += this.equalizeWhitespace(token.value);
+        return this.addNewline(query);
+    }
+
+    formatTablelevelReservedWord(token, query) {
+        this.indentation.decreaseTableLevel();
+
+        query = this.addNewline(query);
+
+        this.indentation.increaseTableLevel();
 
         query += this.equalizeWhitespace(token.value);
         return this.addNewline(query);

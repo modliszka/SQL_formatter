@@ -7,6 +7,7 @@ export default class Tokenizer {
      * @param {Object} cfg
      *  @param {String[]} cfg.reservedWords Reserved words in SQL
      *  @param {String[]} cfg.reservedToplevelWords Words that are set to new line separately
+     *  @param {String[]} cfg.reservedTablelevelWords Words that are set to new line separately
      *  @param {String[]} cfg.reservedNewlineWords Words that are set to newline
      *  @param {String[]} cfg.stringTypes String types to enable: "", '', ``, [], N''
      *  @param {String[]} cfg.openParens Opening parentheses to enable, like (, [
@@ -25,6 +26,7 @@ export default class Tokenizer {
         this.LINE_COMMENT_REGEX = this.createLineCommentRegex(cfg.lineCommentTypes);
 
         this.RESERVED_TOPLEVEL_REGEX = this.createReservedWordRegex(cfg.reservedToplevelWords);
+        this.RESERVED_TABLELEVEL_REGEX = this.createReservedWordRegex(cfg.reservedTablelevelWords);
         this.RESERVED_NEWLINE_REGEX = this.createReservedWordRegex(cfg.reservedNewlineWords);
         this.RESERVED_PLAIN_REGEX = this.createReservedWordRegex(cfg.reservedWords);
 
@@ -250,7 +252,7 @@ export default class Tokenizer {
         if (previousToken && previousToken.value && previousToken.value === ".") {
             return;
         }
-        return this.getToplevelReservedToken(input) || this.getNewlineReservedToken(input) || this.getPlainReservedToken(input);
+        return this.getToplevelReservedToken(input) ||  this.getTablelevelReservedToken(input) ||this.getNewlineReservedToken(input) || this.getPlainReservedToken(input);
     }
 
     getToplevelReservedToken(input) {
@@ -258,6 +260,14 @@ export default class Tokenizer {
             input,
             type: tokenTypes.RESERVED_TOPLEVEL,
             regex: this.RESERVED_TOPLEVEL_REGEX
+        });
+    }
+
+    getTablelevelReservedToken(input) {
+        return this.getTokenOnFirstMatch({
+            input,
+            type: tokenTypes.RESERVED_TABLELEVEL,
+            regex: this.RESERVED_TABLELEVEL_REGEX
         });
     }
 
