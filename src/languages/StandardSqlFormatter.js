@@ -83,6 +83,13 @@ const reservedTablelevelWords = [
     "JOIN"
 ];
 
+const reservedSmallWords = [
+    "and",
+    "or",
+    "xor", 
+    "as"
+];
+
 
 let tokenizer;
 
@@ -104,6 +111,7 @@ export default class StandardSqlFormatter {
         if (!tokenizer) {
             tokenizer = new Tokenizer({
                 reservedWords,
+                reservedSmallWords,
                 reservedToplevelWords,
                 reservedTablelevelWords,
                 reservedNewlineWords,

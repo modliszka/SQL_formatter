@@ -6,6 +6,7 @@ export default {
     WORD: "word",
     STRING: "string",
     RESERVED: "reserved",
+    RESERVED_SMALL: "reserved-small",
     RESERVED_TOPLEVEL: "reserved-toplevel",
     RESERVED_TABLELEVEL: "reserved-tablelevel",
     RESERVED_NEWLINE: "reserved-newline",

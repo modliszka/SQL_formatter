@@ -6,8 +6,9 @@ export default class Tokenizer {
     /**
      * @param {Object} cfg
      *  @param {String[]} cfg.reservedWords Reserved words in SQL
+     *  @param {String[]} cfg.reservedSmallWords Reserved small words in SQL
      *  @param {String[]} cfg.reservedToplevelWords Words that are set to new line separately
-     *  @param {String[]} cfg.reservedTablelevelWords Words that are set to new line separately
+     *  @param {String[]} cfg.reservedTablelevelWords Words that are set to new line separately in FROM part
      *  @param {String[]} cfg.reservedNewlineWords Words that are set to newline
      *  @param {String[]} cfg.stringTypes String types to enable: "", '', ``, [], N''
      *  @param {String[]} cfg.openParens Opening parentheses to enable, like (, [
@@ -17,6 +18,7 @@ export default class Tokenizer {
      *  @param {String[]} cfg.lineCommentTypes Line comments to enable, like # and --
      *  @param {String[]} cfg.specialWordChars Special chars that can be found inside of words, like @ and #
      */
+    
     constructor(cfg) {
         this.WHITESPACE_REGEX = /^(\s+)/;
         this.NUMBER_REGEX = /^((-\s*)?[0-9]+(\.[0-9]+)?|0x[0-9a-fA-F]+|0b[01]+)\b/;
@@ -28,6 +30,7 @@ export default class Tokenizer {
         this.RESERVED_TOPLEVEL_REGEX = this.createReservedWordRegex(cfg.reservedToplevelWords);
         this.RESERVED_TABLELEVEL_REGEX = this.createReservedWordRegex(cfg.reservedTablelevelWords);
         this.RESERVED_NEWLINE_REGEX = this.createReservedWordRegex(cfg.reservedNewlineWords);
+        this.RESERVED_SMALL_PLAIN_REGEX = this.createReservedWordRegex(cfg.reservedSmallWords);
         this.RESERVED_PLAIN_REGEX = this.createReservedWordRegex(cfg.reservedWords);
 
         this.WORD_REGEX = this.createWordRegex(cfg.specialWordChars);
@@ -113,12 +116,35 @@ export default class Tokenizer {
         while (input.length) {
             // Get the next token and the token type
             token = this.getNextToken(input, token);
+
+            token = this.getProperStyle(token);
+
             // Advance the string
             input = input.substring(token.value.length);
 
             tokens.push(token);
         }
         return tokens;
+    }
+
+    getProperStyle(token){
+        const isReserved = 
+            token.type == tokenTypes.RESERVED_TOPLEVEL 
+                || token.type == tokenTypes.RESERVED_TABLELEVEL 
+                || token.type == tokenTypes.RESERVED 
+            ? true : false; 
+        const isSmall = this.getSmallPlainReservedToken(token.value) === undefined ? false : true;
+        
+        if(isSmall){
+            token.value = token.value.toLowerCase();
+        }
+        else if (isReserved) {
+            token.value = token.value.toUpperCase();
+        }
+        // else {
+        //     token.value = this.toCamelCase(token.value);
+        // }
+        return token;
     }
 
     getNextToken(input, previousToken) {
@@ -252,7 +278,7 @@ export default class Tokenizer {
         if (previousToken && previousToken.value && previousToken.value === ".") {
             return;
         }
-        return this.getToplevelReservedToken(input) ||  this.getTablelevelReservedToken(input) ||this.getNewlineReservedToken(input) || this.getPlainReservedToken(input);
+        return this.getToplevelReservedToken(input) ||  this.getTablelevelReservedToken(input) || this.getNewlineReservedToken(input) || this.getPlainReservedToken(input);
     }
 
     getToplevelReservedToken(input) {
@@ -287,6 +313,14 @@ export default class Tokenizer {
         });
     }
 
+    getSmallPlainReservedToken(input) {
+        return this.getTokenOnFirstMatch({
+            input,
+            type: tokenTypes.RESERVED_SMALL,
+            regex: this.RESERVED_SMALL_PLAIN_REGEX
+        });
+    }
+
     getWordToken(input) {
         return this.getTokenOnFirstMatch({
             input,
@@ -302,4 +336,11 @@ export default class Tokenizer {
             return {type, value: matches[1]};
         }
     }
+
+    // toCamelCase(str) {
+    //     return str
+    //         .replace(/\s(.)/g, function($1) { return $1.toUpperCase(); })
+    //         .replace(/\s/g, '')
+    //         .replace(/^(.)/, function($1) { return $1.toLowerCase(); });
+    // }
 }
